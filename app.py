@@ -1,0 +1,74 @@
+# from usecase import LoginUseCase, FetchGradesUseCase, ComputeGpaUseCase
+# from adapter import BsParser, SeleniumClient
+
+# def main():
+#     client = SeleniumClient()
+#     login_uc = LoginUseCase(client, "https://lk.msu.ru/cabinet")
+
+#     id_= "songheelee2810@gmail.com"
+#     pw = "songhee2002"
+#     login_uc.execute(email=id_, password=pw)
+
+#     parser = BsParser()
+#     parser_uc = FetchGradesUseCase(client, parser)
+
+#     grades = parser_uc.execute()
+
+#     gpa_uc = ComputeGpaUseCase()
+
+#     gpa = gpa_uc.execute(grades)
+
+#     print(gpa, sep="\n")
+
+# if __name__ == "__main__":
+#     main()
+
+# app.py (간단 조립 예시)
+from views import MainWindow, LoginView, GradesView
+from adapter import SeleniumClient, BsParser
+from usecase import LoginUseCase, FetchGradesUseCase
+# 선택: GPA 유스케이스가 별도면 import
+# from usecase.compute_gpa_usecase import ComputeGpaUseCase
+
+import config
+
+def create_app():
+    # Adapters
+    client = SeleniumClient()
+    parser = BsParser()
+
+    # UseCases
+    login_uc = LoginUseCase(client, base_url=config.MSU_LOGIN_URL)
+    fetch_uc = FetchGradesUseCase(client, parser)
+
+    # (옵션) GPA 유스케이스 연결
+    try:
+        from usecase import ComputeGpaUseCase
+        gpa_uc = ComputeGpaUseCase()
+    except ModuleNotFoundError:
+        gpa_uc = None
+
+    # Views
+    root = MainWindow()
+    login_view = LoginView(root.container)
+    grades_view = GradesView(root.container)
+
+    root.register_frame("login", login_view)
+    root.register_frame("grades", grades_view)
+    root.navigate_to("login")
+
+    # Presenters
+    from presenters import LoginPresenter
+    from presenters import GradesPresenter
+
+    LoginPresenter(login_view, login_uc)
+    GradesPresenter(grades_view, fetch_uc, gpa_uc)  # gpa_uc 없으면 Presenter 수정 필요
+
+    return root, client
+
+if __name__ == "__main__":
+    root, client = create_app()
+    try:
+        root.mainloop()
+    finally:
+        client.close()
