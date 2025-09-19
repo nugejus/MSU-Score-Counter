@@ -13,19 +13,14 @@ class LoginPresenter:
         self.view.on_submit(self.handle_submit)
 
     def handle_submit(self, email: str, password: str):
-        """
-        View에서 로그인 버튼 눌렀을 때 실행
-        """
         self.view.set_loading(True)
 
         def job():
-            try:
-                self.login_uc.execute(email=email, password=password)
-                self.view.navigate_to("grades")  # 성공 시 화면 전환
-            except Exception as e:
-                self.view.show_error(f"Login failed: {e}")
-            finally:
-                self.view.set_loading(False)
+            ok, msg = self.login_uc.execute(email=email, password=password)
+            if ok:
+                self.view.navigate_to("grades")
+            else:
+                self.view.show_error(msg or "로그인 실패")
+            self.view.set_loading(False)
 
-        # UI 멈춤 방지를 위해 백그라운드 실행
         self.view.run_in_background(job)

@@ -1,34 +1,6 @@
-# from usecase import LoginUseCase, FetchGradesUseCase, ComputeGpaUseCase
-# from adapter import BsParser, SeleniumClient
-
-# def main():
-#     client = SeleniumClient()
-#     login_uc = LoginUseCase(client, "https://lk.msu.ru/cabinet")
-
-#     id_= "songheelee2810@gmail.com"
-#     pw = "songhee2002"
-#     login_uc.execute(email=id_, password=pw)
-
-#     parser = BsParser()
-#     parser_uc = FetchGradesUseCase(client, parser)
-
-#     grades = parser_uc.execute()
-
-#     gpa_uc = ComputeGpaUseCase()
-
-#     gpa = gpa_uc.execute(grades)
-
-#     print(gpa, sep="\n")
-
-# if __name__ == "__main__":
-#     main()
-
-# app.py (간단 조립 예시)
 from views import MainWindow, LoginView, GradesView
 from adapter import SeleniumClient, BsParser
 from usecase import LoginUseCase, FetchGradesUseCase
-# 선택: GPA 유스케이스가 별도면 import
-# from usecase.compute_gpa_usecase import ComputeGpaUseCase
 
 import config
 
@@ -58,8 +30,7 @@ def create_app():
     root.navigate_to("login")
 
     # Presenters
-    from presenters import LoginPresenter
-    from presenters import GradesPresenter
+    from presenters import LoginPresenter, GradesPresenter
 
     LoginPresenter(login_view, login_uc)
     GradesPresenter(grades_view, fetch_uc, gpa_uc)  # gpa_uc 없으면 Presenter 수정 필요
