@@ -16,11 +16,11 @@ class LoginPresenter:
         self.view.set_loading(True)
 
         def job():
-            ok, msg = self.login_uc.execute(email=email, password=password)
+            ok = self.login_uc.execute(email=email, password=password)
             if ok:
                 self.view.navigate_to("grades")
             else:
-                self.view.show_error(msg or "로그인 실패")
+                self.view.show_error("로그인 실패")
             self.view.set_loading(False)
 
         self.view.run_in_background(job)
