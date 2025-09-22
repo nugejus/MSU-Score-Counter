@@ -88,3 +88,6 @@ class GradesView(tk.Frame):
     def _refresh_clicked(self):
         if self._on_refresh:
             self._on_refresh()
+
+    def geometry_config(self):
+        return "840x560"

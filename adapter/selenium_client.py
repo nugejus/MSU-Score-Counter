@@ -9,7 +9,7 @@ import time
 class SeleniumClient(WebClientPort):
     def __init__(self):
         opts = webdriver.ChromeOptions()
-        # opts.add_argument("--headless")
+        opts.add_argument("--headless")
         self.driver = webdriver.Chrome(options=opts)
 
     def open(self, url: str) -> None:

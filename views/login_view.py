@@ -68,3 +68,6 @@ class LoginView(tk.Frame):
             email = self.email_var.get().strip()
             pw = self.pw_var.get()
             self._on_submit(email, pw)
+
+    def geometry_config(self):
+        return "500x200"
