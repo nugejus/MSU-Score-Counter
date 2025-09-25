@@ -1,6 +1,6 @@
 # views/login_view.py
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from typing import Callable
 
 class LoginView(tk.Frame):
@@ -35,6 +35,9 @@ class LoginView(tk.Frame):
 
         self.login_btn = ttk.Button(self, text="Login", command=self._submit_clicked)
         self.login_btn.grid(row=3, column=1, sticky="w", padx=8, pady=(12, 6))
+        
+        self.exit_btn = ttk.Button(self, text="Exit", command=self._exit)
+        self.exit_btn.grid(row=3, column=2, sticky="w", padx=8, pady=(12, 6))
 
         self.status_var = tk.StringVar(value="")
         self.status_label = ttk.Label(self, textvariable=self.status_var, foreground="#cc0000")
@@ -52,7 +55,8 @@ class LoginView(tk.Frame):
         self.status_var.set("Signing in..." if flag else "")
 
     def show_error(self, msg: str):
-        self.status_var.set(msg)
+        # 팝업 다이얼로그로 에러 표시
+        messagebox.showerror("Error", msg)
 
     def navigate_to(self, route: str):
         # MainWindow에 위임
@@ -71,3 +75,6 @@ class LoginView(tk.Frame):
 
     def geometry_config(self):
         return "500x200"
+    
+    def _exit(self):
+        self.master.master.quit()

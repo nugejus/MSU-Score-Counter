@@ -31,8 +31,8 @@ class MainWindow(tk.Tk):
         frame.tkraise()
 
         self.geometry(frame.geometry_config())
-        
+
     def run_in_background(self, func: Callable):
-        """UI 프리징 방지용. 예외 처리/로깅은 여기서 확장 가능."""
+        """UI 프리징 방지용"""
         t = threading.Thread(target=func, daemon=True)
         t.start()

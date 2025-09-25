@@ -20,7 +20,7 @@ class LoginPresenter:
             if ok:
                 self.view.navigate_to("grades")
             else:
-                self.view.show_error("로그인 실패")
+                self.view.show_error("Incorrect id or pw")
             self.view.set_loading(False)
 
         self.view.run_in_background(job)
