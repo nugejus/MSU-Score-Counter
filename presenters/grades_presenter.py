@@ -14,12 +14,12 @@ class GradesPresenter:
 
         self.view.on_refresh(self.handle_refresh)
 
-    def handle_refresh(self):
+    def handle_refresh(self, diploma_only):
         self.view.set_loading(True)
 
         def job():
             try:
-                grades = self.fetch_uc.execute()
+                grades = self.fetch_uc.execute(diploma_only=diploma_only)
                 gpas = self.gpa_uc.execute(grades)
                 self.view.render_grades(grades)
                 self.view.render_gpa(gpas)

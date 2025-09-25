@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable
-from domain.models import GradeEntry  # 타입 힌트용 (없어도 동작엔 영향 X)
+# from domain.models import GradeEntry  # 타입 힌트용 (없어도 동작엔 영향 X)
 
 class GradesView(tk.Frame):
     """
@@ -23,12 +23,18 @@ class GradesView(tk.Frame):
         top.pack(fill="x", padx=8, pady=8)
 
         ttk.Label(top, text="Grades", font=("Segoe UI", 14, "bold")).pack(side="left")
-        self.refresh_btn = ttk.Button(top, text="Refresh", command=self._refresh_clicked)
+        self.refresh_btn = ttk.Button(top, text="Calculate", command=self._refresh_clicked)
         self.refresh_btn.pack(side="right", padx=4)
 
         # 상태/에러
+        second_top = ttk.Frame(self)
+        second_top.pack(fill="x", padx=8, pady =0)
         self.status_var = tk.StringVar(value="")
-        ttk.Label(self, textvariable=self.status_var).pack(anchor="w", padx=8)
+        ttk.Label(second_top, textvariable=self.status_var).pack(side="left")
+
+        self.diploma_only_check = tk.IntVar(value = 0)
+        self.diploma_only_button = ttk.Checkbutton(second_top, text = "diploma only", variable=self.diploma_only_check)
+        self.diploma_only_button.pack(side = "right")
 
         # 성적 테이블
         table_frame = ttk.Frame(self)
@@ -66,7 +72,8 @@ class GradesView(tk.Frame):
     def show_error(self, msg: str):
         self.status_var.set(msg)
 
-    def render_grades(self, grades: list[GradeEntry]):
+    # def render_grades(self, grades: list[GradeEntry]):
+    def render_grades(self, grades: list):
         # 기존 데이터 초기화
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -87,7 +94,67 @@ class GradesView(tk.Frame):
     # ---------- 내부 ----------
     def _refresh_clicked(self):
         if self._on_refresh:
-            self._on_refresh()
+            self._on_refresh(self.diploma_only_check.get())
 
     def geometry_config(self):
         return "840x560"
+    
+if __name__ == "__main__":
+    import tkinter as tk
+    from tkinter import ttk
+
+    # --- 더미 데이터/타입 ---
+    class DummyGPA:
+        def __init__(self, name, value, count):
+            self.scheme_name = name
+            self.value = value
+            self.count = count
+
+    class Mark:
+        EXCELLENT = type("M", (), {"value": "отлично"})
+        GOOD      = type("M", (), {"value": "хорошо"})
+        SATISFACTORY = type("M", (), {"value": "удов."})
+
+    class GradeEntry:
+        def __init__(self, subject, mark):
+            self.subject = subject
+            self.mark = mark
+
+    # --- 앱 부트 ---
+    root = tk.Tk()
+    root.title("GradesView Fake Run")
+
+    view = GradesView(root)
+    view.pack(fill="both", expand=True)
+    root.geometry(view.geometry_config())
+
+    # 초기 성적 렌더
+    sample_grades = [
+        GradeEntry("Физиология", Mark.EXCELLENT),
+        GradeEntry("Гистология", Mark.GOOD),
+        GradeEntry("Химия", Mark.SATISFACTORY),
+    ]
+    view.render_grades(sample_grades)
+
+    # on_refresh 더미: 체크박스 상태 반영해 GPA 계산 흉내
+    def fake_refresh():
+        view.set_loading(True)
+        # diploma_only 체크 여부
+        only = bool(view.diploma_only_check.get())
+
+        # 더미 GPA 결과
+        gpas = [
+            DummyGPA("5.0", 4.56 if not only else 4.80, len(sample_grades)),
+            DummyGPA("4.5", 3.98 if not only else 4.20, len(sample_grades)),
+            DummyGPA("4.3", 3.80 if not only else 4.05, len(sample_grades)),
+        ]
+        view.render_gpa(gpas)
+        view.set_loading(False)
+        view.status_var.set("Calculated (diploma only: %s)" % ("ON" if only else "OFF"))
+
+    view.on_refresh(fake_refresh)
+
+    # 시작 메시지
+    view.status_var.set("Ready. Click 'Calculate'.")
+
+    root.mainloop()

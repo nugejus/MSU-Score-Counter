@@ -12,10 +12,10 @@ def create_app():
     root.register_frame("loading", loading_view)
     root.navigate_to("loading")
 
-    def bootstrap():
-        loading_view.set_status("Preparing client....")
-        client = SeleniumClient()
+    loading_view.set_status("Preparing client....")
+    client = SeleniumClient()
 
+    def bootstrap():
         loading_view.set_status("Preparing Parser....")
         parser = BsParser()
 
@@ -32,18 +32,16 @@ def create_app():
             root.register_frame("grades", grades_view)
             root.navigate_to("login")
 
-    # Presenters
-
             LoginPresenter(login_view, login_uc)
             GradesPresenter(grades_view, fetch_uc, gpa_uc)  # gpa_uc 없으면 Presenter 수정 필요
         
-        root.after(0,wire_up)
+        root.after(0, wire_up)
     root.run_in_background(bootstrap)
-    return root
+    return root, client
 
 if __name__ == "__main__":
-    root = create_app()
+    root, client = create_app()
     try:
         root.mainloop()
     finally:
-        root.client.close()
+        client.close()
