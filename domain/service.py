@@ -1,5 +1,5 @@
 # domain/services.py
-from domain import GPAResult, GradeEntry, Mark
+from models import GPAResult, GradeEntry, Mark
 
 
 class GpaScheme:
