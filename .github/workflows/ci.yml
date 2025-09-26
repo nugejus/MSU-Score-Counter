@@ -1,0 +1,52 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest coverage flake8 black pylint
+      
+      - name: Install NLTK data
+        run: |
+          python - <<'PY'
+          import nltk
+          nltk.download('punkt')
+          nltk.download('punkt_tab')
+          PY
+
+      # - name: Check formatting with black
+      #   run: black --check 01 02
+
+      - name: Black version
+        run: python -c "import black,sys;print('black', black.__version__)"
+      - name: Check formatting with black (diff)
+        run: black --check --diff
+
+      - name: Lint with flake8
+        run: flake8
+
+      - name: Static analysis with pylint
+        run: pylint
+
+      - name: Run tests with coverage
+        run: |
+          coverage run -m pytest
+          coverage report -m
