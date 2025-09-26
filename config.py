@@ -1,27 +1,44 @@
 """
-config.py — 전역 설정 및 환경변수 로딩
+Global configuration and environment variable loading.
+
+This module centralizes configuration values such as service URLs,
+login success/failure probes, and other runtime settings. Environment
+variables are used when available, with sensible defaults.
 """
 
 import os
 from pathlib import Path
-# -------------------
-# 기본 경로
-# -------------------
-BASE_DIR = Path(__file__).resolve().parent
+
+BASE_DIR: Path = Path(__file__).resolve().parent
+"""Path: Base directory of the project (the directory containing this config)."""
+
+MSU_LOGIN_URL: str = os.getenv("MSU_LOGIN_URL", "https://lk.msu.ru/cabinet")
+"""str: Login page URL for the MSU Cabinet system.
+
+Defaults to ``https://lk.msu.ru/cabinet`` if the environment variable
+``MSU_LOGIN_URL`` is not set.
+"""
 
 # -------------------
-# 서비스 URL
-# -------------------
-MSU_LOGIN_URL = os.getenv("MSU_LOGIN_URL", "https://lk.msu.ru/cabinet")
-
-
-# config.py (추가)
-LOGIN_SUCCESS_PROBES = [
-    ("link", "Оценки"),                 # 상단/사이드 메뉴에 'Оценки' 링크가 보이면 성공
+LOGIN_SUCCESS_PROBES: list[tuple[str, str]] = [
+    ("link", "Оценки"),  # Presence of "Оценки" link indicates success
 ]
-LOGIN_ERROR_PROBES = [
-    ("css", ".alert-danger"),           # 부트스트랩 경고 박스
-    ("css", ".invalid-feedback"),       # 폼 밑 에러
-    ("css", ".help-block"),
+"""list[tuple[str, str]]: Probes to check for login success.
+
+Each probe is a (by, selector) tuple to locate UI elements that only
+appear on successful login.
+"""
+
+LOGIN_ERROR_PROBES: list[tuple[str, str]] = [
+    ("css", ".alert-danger"),  # Bootstrap alert box
+    ("css", ".invalid-feedback"),  # Invalid form field message
+    ("css", ".help-block"),  # Generic form error block
 ]
-LOGIN_POSTWAIT_SEC = 5                  # 로그인 클릭 후 최대 대기
+"""list[tuple[str, str]]: Probes to check for login failure.
+
+Each probe is a (by, selector) tuple to locate error messages
+in the login page.
+"""
+
+LOGIN_POSTWAIT_SEC: int = 5
+"""int: Maximum number of seconds to wait after clicking login before checking probes."""
