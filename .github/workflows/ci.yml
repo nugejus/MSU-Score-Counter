@@ -29,8 +29,9 @@ jobs:
 
       - name: Black version
         run: python -c "import black,sys;print('black', black.__version__)"
+      
       - name: Check formatting with black (diff)
-        run: black --check --diff
+        run: black --check --diff .
 
       - name: Lint with flake8
         run: flake8
